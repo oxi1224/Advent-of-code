@@ -35,7 +35,6 @@ class Solution {
     }
 
     fillVisitedTiles(grid, visited, guard_x, guard_y, rows, cols);
-    System.out.println(visited.size());
 
     int foundLoops = 0;
     // 0 -> y; 1 -> x
