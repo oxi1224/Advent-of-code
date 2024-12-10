@@ -30,6 +30,7 @@ class Solution {
       //   else System.out.print(n);
       // }
       // System.out.println();
+      // System.out.println();
 
       int[] block_pos = findBlock(disk, curId);
       int block_size = block_pos[1] - block_pos[0] + 1;
@@ -57,6 +58,7 @@ class Solution {
     //   else System.out.print(n);
     // }
     // System.out.println();
+
 
     for (int i = 0; i < disk.size(); i++) {
       if (disk.get(i) == -1) continue;
