@@ -134,7 +134,7 @@ class Solution {
             }
           }
           
-          // Check if there arent any walls outside of the bounding box that would block movemenet
+          // Check if there arent any walls directly outside of the bounding box that would block movemenet
           boolean blocked = false;
           for (int boxY = colissionBox[0][0]; boxY <= colissionBox[1][0]; boxY++) {
             for (int boxX = colissionBox[0][1]; boxX <= colissionBox[1][1]; boxX++) {
@@ -145,14 +145,6 @@ class Solution {
               ) blocked = true;
             }
           }
-          // for (int boxX = colissionBox[0][1]; boxX <= colissionBox[1][1]; boxX++) {
-          //   // Going up checks Y > min and down Y > max
-          //   int collisionY = offset[0] == -1 ? colissionBox[0][0] : colissionBox[1][0];
-          //   if (grid.get(collisionY + offset[0]).get(boxX) == '#') {
-          //     blocked = true;
-          //     break;
-          //   }
-          // }
           // If movement is blocked
           if (blocked) continue;
           
