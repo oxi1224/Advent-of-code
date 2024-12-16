@@ -3,7 +3,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -89,73 +88,53 @@ class Solution {
           
         // If moving up/down
         } else if (offset[1] == 0) {
-          // In order: [min y, min x], [max y, max x], used for determinig the moving boxes
-          int[][] colissionBox = new int[][]{ {9999, 9999}, {0, 0} };
+          // Only stores the positions of '[' because ']' is always x + 1
+          ArrayList<List<Integer>> pieces = new ArrayList<>();
+          // if at (y, x) is not [ then previous character must be it
+          pieces.add(Arrays.asList(y, grid.get(y).get(x) == '[' ? x  : x - 1));
           
-          // DFS to determine the collision box
+          // DFS to find all connected boxes
           Stack<int[]> stack = new Stack<>();
           stack.push(new int[]{y, x});
-          stack.push(new int[]{y, grid.get(y).get(x) == '[' ? x + 1 : x - 1}); // Push the other brace
+          stack.push(new int[]{y, grid.get(y).get(x) == '[' ? x + 1 : x - 1}); // Push the other bracket
           while (!stack.empty()) {
             int[] coords = stack.pop();
-            // current Y < minimum Y
-            if (coords[0] < colissionBox[0][0]) colissionBox[0][0] = coords[0];
-            // current X < minimum X
-            if (coords[1] < colissionBox[0][1]) colissionBox[0][1] = coords[1];
-            // current Y > maximum Y
-            if (coords[0] > colissionBox[1][0]) colissionBox[1][0] = coords[0];
-            // current X < maximum X
-            if (coords[1] > colissionBox[1][1]) colissionBox[1][1] = coords[1];
             
             int boxY = coords[0] + offset[0];
             int boxX = coords[1];
             if (!isBox(grid, boxY, boxX)) continue;
 
             stack.push(new int[]{ boxY, boxX });
-            stack.push(new int[]{ boxY, grid.get(boxY).get(boxX) == '[' ? boxX + 1 : boxX - 1 }); // Push the other brace
+            stack.push(new int[]{boxY, grid.get(boxY).get(boxX) == '[' ? boxX + 1 : boxX - 1 }); // Push the other bracket
+            
+            List<Integer> leftBracketCoords = Arrays.asList(boxY, grid.get(boxY).get(boxX) == '[' ? boxX : boxX - 1);
+            if (!pieces.contains(leftBracketCoords)) pieces.add(leftBracketCoords);
           }
           
-          // Pieces which should be moved
-          ArrayList<List<Integer>> pieces = new ArrayList<>();
-          for (int boxY = colissionBox[0][0]; boxY <= colissionBox[1][0]; boxY++) {
-            for (int boxX = colissionBox[0][1]; boxX <= colissionBox[1][1]; boxX++) {
-              // if (
-              //   boxY != colissionBox[0][0] &&
-              //   grid.get(boxY).get(boxX) == '[' &&
-              //   !isBox(grid, boxY + offset[0], boxX) &&
-              //   !isBox(grid, boxY + offset[0], boxX + 1)
-              // ) continue;
-              // Check if box is fully inside of collision area
-              if (
-                grid.get(boxY).get(boxX) == '[' &&
-                grid.get(boxY).get(boxX + 1) == ']' && 
-                (boxX + 1) <= colissionBox[1][1]
-              ) pieces.add(Arrays.asList(boxY, boxX + 1));
-            }
-          }
-          
-          // Check if there arent any walls directly outside of the bounding box that would block movemenet
+          // Check if there arent any walls affecting movement
           boolean blocked = false;
-          for (int boxY = colissionBox[0][0]; boxY <= colissionBox[1][0]; boxY++) {
-            for (int boxX = colissionBox[0][1]; boxX <= colissionBox[1][1]; boxX++) {
-              if (
-                pieces.contains(Arrays.asList(boxY, boxX + 1)) &&
-                (grid.get(boxY + offset[0]).get(boxX) == '#' ||
-                grid.get(boxY + offset[0]).get(boxX + 1) == '#')
-              ) blocked = true;
-            }
+          for (List<Integer> piece : pieces) {
+            int py = piece.get(0);
+            int px = piece.get(1);
+            if (grid.get(py + offset[0]).get(px) == '#' || grid.get(py + offset[0]).get(px + 1) == '#') blocked = true;
           }
-          // If movement is blocked
           if (blocked) continue;
           
-          // Easier to reverse the order when going up so that next boxes dont override previous ones
-          if (offset[0] == 1) Collections.reverse(pieces);
+          // Sorting ensures no brackets are overriden when updating positions
+          if (offset[0] == 1) {
+            pieces.sort((a, b) -> { return Integer.compare(a.get(0), b.get(0)) * -1; });
+          } else {
+            pieces.sort((a, b) -> { return Integer.compare(a.get(0), b.get(0)); });
+          }
+
           // Update positions and remove previous
           for (List<Integer> piece : pieces) {
-            grid.get(piece.get(0) + offset[0]).set(piece.get(1) - 1, '[');
-            grid.get(piece.get(0) + offset[0]).set(piece.get(1), ']');
-            grid.get(piece.get(0)).set(piece.get(1) - 1, '.');
-            grid.get(piece.get(0)).set(piece.get(1), '.');
+            int py = piece.get(0);
+            int px = piece.get(1);
+            grid.get(py + offset[0]).set(px, '[');
+            grid.get(py + offset[0]).set(px + 1, ']');
+            grid.get(py).set(px, '.');
+            grid.get(py).set(px + 1, '.');
           }
         
           // Update robot position
