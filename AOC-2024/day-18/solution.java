@@ -47,7 +47,7 @@ class Solution {
     }
 
     // int[] = [y, x, steps] 
-    PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[2], b[2])); // Order the priority queue by distance ascending 
+    PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[2], b[2]));
     boolean[][] visited = new boolean[COLS][ROWS];
     pq.add(new int[]{0, 0, 0});
 
