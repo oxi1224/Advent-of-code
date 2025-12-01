@@ -21,7 +21,7 @@ class Solution {
       connectionMap.get(l).add(r);
       connectionMap.get(r).add(l);
     }
-   
+    
     HashSet<List<String>> connectionSets = new HashSet<>();
     for (String a : connectionMap.keySet()) {
       for (String b : connectionMap.get(a)) {
