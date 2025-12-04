@@ -28,6 +28,7 @@ function part_one() {
   }
   console.log(s);
 }
+part_one();
 
 const MAX_SWITCHES = 12;
 function part_two() {
